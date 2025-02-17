@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
 <suite name="Test Suite for Buildout">
+    <parameter name="ProductName1" value="Washing Machine" />
+    <parameter name="ProductName2" value="iPhone" />
+    <parameter name="ProductName3" value="Coffee Mug" />
     <test name = "Test Cases for Buildout">
        <classes>          
             <class name="demo.TestCases"></class>
