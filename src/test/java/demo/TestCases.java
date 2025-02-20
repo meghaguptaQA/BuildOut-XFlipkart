@@ -8,6 +8,7 @@ import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.annotations.AfterTest;
@@ -86,26 +87,18 @@ public class TestCases {
         Thread.sleep(5000);
 
         //Get the search results with rating 4 or less
-        List<WebElement> SearchRes=driver.findElements(By.xpath("//span[contains(@id,'productRating')]/div"));
-        int count=0;
-        for(WebElement res:SearchRes)
-        {   Float i=Float.parseFloat(res.getText().toString());
-            System.out.println(i);
-             if (i<=4.0) 
-             {
-                count++;
-             }
-        }
+        int count=Wrappers.GetCount4StarandBelow(driver);
+
         System.out.println("Count of items with rating less than or equal to 4 stars is: "+count);
-        SearchRes=driver.findElements(By.xpath("//span[contains(@id,'productRating')]/div[text()<='4']"));
-        System.out.println("Count of items with rating less than or equal to 4 stars is: "+SearchRes.size());                
+        // SearchRes=driver.findElements(By.xpath("//span[contains(@id,'productRating')]/div[text()<='4']"));
+        // System.out.println("Count of items with rating less than or equal to 4 stars is: "+SearchRes.size());                
         System.out.println("end Test case: testCase01");
         
     }
    
     @Test
-    @Parameters({ "ProductName2" })
-    public void testCase02(@Optional("testUser") String ProductName2) throws InterruptedException 
+    @Parameters({ "ProductName2","Discount" })
+    public void testCase02(@Optional("testUser") String ProductName2,String Discount) throws InterruptedException 
      {
         System.out.println("Start Test case: testCase02");
         //Open the URL to Flipkart home page
@@ -116,29 +109,8 @@ public class TestCases {
         Wrappers.SearchForProduct(driver, ProductName2);
         Thread.sleep(3000);
 
-        //Get the search results with discount% greater than 17
-        List<WebElement> SearchRes=driver.findElements(By.xpath("//div[@class='yKfJKb row']"));
-        int count=0;
-        for(WebElement res:SearchRes)
-        {   //div[@class='UkUFwK']//span     
-            WebElement discnt =res.findElement(By.xpath("./div[2]//span"))  ;    
-            String i=discnt.getText().toString();
-           // System.out.println("I is:"+i);
-            String[] arrStr=i.split("%");
-            Integer discount=Integer.parseInt(arrStr[0]);
-            //System.out.println("Discount is: "+discount);
-             if (discount>17) 
-             {
-
-                count++;
-                WebElement title=res.findElement(By.xpath(".//div[@class='KzDlHZ']"));
-                System.out.println(title.getText().toString()+" : Discount is - "+discount+"%");
-             }
-        }
-        if(count==0)
-        {
-            System.out.println("No Iphone with more than 17% discount.");
-        }
+        //Get and prin the search results with discount% greater than 17
+          Wrappers.PrintDiscountMoreThanXpercent(driver,Discount);
                      
         System.out.println("end Test case: testCase02");
         
@@ -157,61 +129,12 @@ public class TestCases {
         Thread.sleep(3000);
         //Click on checkbox 4* and ab0ve
         String txt4starabove="4";
-        //div[text()='4★ & above']//preceding-sibling::div
         
         WebElement checkbox4Star=driver.findElement(By.xpath("//div[contains(text(),'"+txt4starabove+"') and contains(text(),'above')]//preceding-sibling::div"));
         Wrappers.btn_click(checkbox4Star);
         Thread.sleep(9000);
-        //Get the search results with discount% greater than 17
-        List<WebElement> SearchRes=driver.findElements(By.xpath("//div[@class='slAVV4']//div/span[2]"));
-       // int count=SearchRes.size();
-       // System.out.println("");
-        //System.out.println("Count is :"+count);
-        //System.out.println("");
-        HashMap<Integer,String> map=new HashMap<>();
-        //count=0;
-        for(WebElement res:SearchRes)
-        {   
-            //Thread.sleep(2000);
-            String i=res.getText().toString();
-            WebElement Url=Wrappers.FindElement(res, "./ancestor::div[@class='slAVV4']//img[@class='DByuf4']");
-            WebElement title=Wrappers.FindElement(res, "./ancestor::div[@class='slAVV4']//a[2]");
-            String URL=Url.getAttribute("src").toString();
-            String Title=title.getAttribute("title").toString();
-             //System.out.println("I is:"+i);
-             //i=i.replaceAll([^0-9],"");
-             i=i.replace("(", "");
-             i=i.replace(")", "");
-             i=i.replace(",", "");
-             Integer reviews=Integer.parseInt(i);
-             //System.out.println("no of reviews are "+reviews);
-             
-             //Thread.sleep(2000);
-             
-             //System.out.println("URL is "+URL);
-             
-             //System.out.println("Title is "+Title);
-             map.put(reviews, "Title: "+Title+", Image URL: "+URL);
-             //count++;
-             //System.out.println("Count increment :"+count);
-        }
-        ArrayList<Integer> sortedKeys  = new ArrayList<Integer>(map.keySet());
-            //      Collections.sort(userReviewCountList,Collections.reverseOrder());   [^\\d]
-        //Collections.sort(sortedKeys,Collections.reverseOrder());
-        //Collections.reverseOrder(sortedKeys);
-        Collections.sort(sortedKeys);
-        int size=sortedKeys.size();
-        System.out.println("Title and Image URL for top 5 reviews are :");
-        for(int l=size-1;l>(size-6);l--)
-        {
-            //System.out.println("Key is: "+sortedKeys.get(l));
-            System.out.println("Reviews:"+sortedKeys.get(l)+"  ,  "+map.get(sortedKeys.get(l)));
-        }
-        // for(Map.Entry<Integer,String> entry : map.entrySet())
-        // {
-        //         System.out.println("KEY :"+entry.getKey()+"  Title and URL :"+entry.getValue());
-                
-        // }
+        //Get and print the search results highest reviews
+        Wrappers.PrintImageAndURLWithHighestReviews(driver,5);
                      
         System.out.println("end Test case: testCase03");
         
