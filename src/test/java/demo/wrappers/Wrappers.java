@@ -5,6 +5,10 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
@@ -12,6 +16,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
@@ -93,4 +98,69 @@ public class Wrappers {
 
     }
 
+    public static int GetCount4StarandBelow(RemoteWebDriver driver)
+        {
+            List<WebElement> SearchRes=driver.findElements(By.xpath("//span[contains(@id,'productRating')]/div"));
+            int count=0;
+            for(WebElement res:SearchRes)
+            {   Float i=Float.parseFloat(res.getText().toString());
+                System.out.println(i);
+                 if (i<=4.0) 
+                 {
+                    count++;
+                 }
+            }
+            return count;
+        }
+        public static void PrintDiscountMoreThanXpercent(RemoteWebDriver driver,String Discount)
+        {
+            List<WebElement> SearchRes=driver.findElements(By.xpath("//div[@class='yKfJKb row']"));
+            int count=0;
+            for(WebElement res:SearchRes)
+            {      
+                WebElement discnt =res.findElement(By.xpath("./div[2]//span"))  ;    
+                String txtDisc=discnt.getText().toString();
+                String regex="[^0-9]";
+                txtDisc=txtDisc.replaceAll(regex,"");
+    
+                Integer Discnt=Integer.parseInt(txtDisc);
+                 if (Discnt>17) 
+                 {
+                    count++;
+                    WebElement title=res.findElement(By.xpath(".//div[@class='KzDlHZ']"));
+                    System.out.println(title.getText().toString()+" : Discount is - "+Discnt+"%");
+                 }
+            }
+            if(count==0)
+            {
+                System.out.println("No Iphone with more than 17% discount.");
+            }
+                     
+        }
+        public static void PrintImageAndURLWithHighestReviews(RemoteWebDriver driver,Integer Count)
+        {
+            List<WebElement> SearchRes=driver.findElements(By.xpath("//div[@class='slAVV4']//div/span[2]"));
+            HashMap<Integer,String> map=new HashMap<>();
+            for(WebElement res:SearchRes)
+            {   
+                String textreview=res.getText().toString();
+                WebElement Url=Wrappers.FindElement(res, "./ancestor::div[@class='slAVV4']//img[@class='DByuf4']");
+                WebElement title=Wrappers.FindElement(res, "./ancestor::div[@class='slAVV4']//a[2]");
+                String URL=Url.getAttribute("src").toString();
+                String Title=title.getAttribute("title").toString();
+                String regex="[^0-9]";
+                textreview=textreview.replaceAll(regex,"");
+                Integer reviews=Integer.parseInt(textreview);
+                map.put(reviews, "Title: "+Title+", Image URL: "+URL);
+
+            }
+            ArrayList<Integer> sortedKeys  = new ArrayList<Integer>(map.keySet());
+            Collections.sort(sortedKeys,Collections.reverseOrder()); //  [^\\d]
+            System.out.println("Title and Image URL for top 5 reviews are :");
+            for(int l=0;l<Count;l++)
+            {           
+                System.out.println("Reviews:"+sortedKeys.get(l)+"  ,  "+map.get(sortedKeys.get(l)));
+            }
+                     
+        }
 }
